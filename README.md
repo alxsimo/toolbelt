@@ -4,7 +4,7 @@
 <img src="https://cloud.githubusercontent.com/assets/579465/14857168/791f7e2c-0c9b-11e6-9da5-ed71f0c77d7e.png" align="left" width="250px" height="250px"/>
 <img align="left" width="0" height="168px" hspace="10"/>
 
-*The **Toolbelt** library is just a set of utilities and classes extracted from popular libraries as **Guava, Apache Commons, etc**.*
+The **Toolbelt** library is just a set of utilities and classes extracted from popular libraries as **Guava, Apache Commons, etc**.
 
 All this library and idea is inspired on on **Fernando Cejas**'s [Arrow library](https://github.com/android10/arrow).
 
