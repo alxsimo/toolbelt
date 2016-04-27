@@ -15,12 +15,13 @@
  */
 package com.alexsimo.toolbelt.optional;
 
-import com.fernandocejas.arrow.functions.Function;
 import java.util.Collections;
 import java.util.Set;
+
+import com.alexsimo.toolbelt.functions.Function;
 import org.jetbrains.annotations.Nullable;
 
-import static com.fernandocejas.arrow.checks.Preconditions.checkNotNull;
+import static com.alexsimo.toolbelt.checks.Preconditions.checkNotNull;
 
 /**
  * Implementation of an {@link Optional} containing a reference.
