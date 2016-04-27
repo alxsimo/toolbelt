@@ -15,11 +15,12 @@
  */
 package com.alexsimo.toolbelt.functions;
 
-import com.fernandocejas.arrow.objects.MoreObjects;
 import java.io.Serializable;
+
+import com.alexsimo.toolbelt.objects.MoreObjects;
 import org.jetbrains.annotations.Nullable;
 
-import static com.fernandocejas.arrow.checks.Preconditions.checkNotNull;
+import static com.alexsimo.toolbelt.checks.Preconditions.checkNotNull;
 
 /**
  * Static utility methods pertaining to {@code Function} instances.
