@@ -1,10 +1,40 @@
-group 'com.alexsimo'
-version '0.1'
+group TOOLBELT_ORG
+version TOOLBELT_VERSION
 
 apply plugin: 'java'
+apply plugin: 'com.jfrog.bintray'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+    }
+}
+
+bintray {
+    user = hasProperty('BINTRAY_USER') ? BINTRAY_USER : System.getenv('BINTRAY_USER')
+    key = hasProperty('BINTRAY_API_KEY') ? BINTRAY_USER : System.getenv('BINTRAY_API_KEY')
+    pkg {
+        repo = 'maven'
+        name = TOOLBELT_NAME
+        desc = TOOLBELT_DESC
+        released = new Date()
+        userOrg = TOOLBELT_ORG
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/alexsimo/toolbelt.git'
+        version {
+            name = TOOLBELT_VERSION
+            desc = TOOLBELT_VERSION_DESC
+            released  = new Date()
+            vcsTag = '0.1.0'
+        }
+    }
+}
 
 repositories {
     mavenCentral()
