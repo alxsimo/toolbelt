@@ -1,12 +1,6 @@
 group TOOLBELT_ORG
 version TOOLBELT_VERSION
 
-apply plugin: 'java'
-apply plugin: 'com.novoda.bintray-release'
-
-targetCompatibility = JavaVersion.VERSION_1_7
-sourceCompatibility = JavaVersion.VERSION_1_7
-
 buildscript {
     repositories {
         jcenter()
@@ -16,6 +10,16 @@ buildscript {
     }
 }
 
+apply plugin: 'java'
+apply plugin: 'com.novoda.bintray-release'
+
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+repositories {
+    mavenCentral()
+}
+
 publish {
     userOrg = hasProperty('BINTRAY_USER') ? BINTRAY_USER : System.getenv('BINTRAY_USER')
     groupId = TOOLBELT_ORG
@@ -23,6 +27,8 @@ publish {
     publishVersion = TOOLBELT_VERSION
     desc = TOOLBELT_DESC
     website = TOOLBELT_WEBSITE
+    bintrayUser = hasProperty('BINTRAY_USER') ? BINTRAY_USER : System.getenv('BINTRAY_USER')
+    bintrayKey = hasProperty('BINTRAY_KEY') ? BINTRAY_KEY : System.getenv('BINTRAY_KEY')
 }
 
 
