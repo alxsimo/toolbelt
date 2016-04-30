@@ -1,0 +1,122 @@
+import java.text.SimpleDateFormat
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+
+def buildDirectory = "$buildDir/libs"
+def pomFilePath = "$buildDirectory/$APP_ARTIFACT-$APP_VERSION" + ".pom"
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
+//https://maven.apache.org/guides/mini/guide-central-repository-upload.html
+//http://central.sonatype.org/pages/requirements.html#a-complete-example-pom
+//https://medium.com/@vyarus/the-hard-way-to-maven-central-c9e16d163acc#.t0evkiaet
+def pomConfig = {
+    licenses {
+        license {
+            name "$LICENSE_NAME"
+            url "$LICENSE_URL"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            name "$DEVELOPER_NAME"
+            email "$DEVELOPER_EMAIL"
+            organization "$APP_GROUP"
+            organizationUrl "$DEVELOPER_URL"
+        }
+    }
+    scm {
+        connection "$APP_WEBSITE"
+        developerConnection "$DEVELOPER_URL"
+        url "$APP_WEBSITE"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId "$APP_GROUP"
+            artifactId "$APP_ARTIFACT"
+            version "$APP_VERSION"
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                def pomNode = asNode()
+                //Clean up useless stuff in order to organize it
+                pomNode.remove(pomNode.get("packaging"))
+                //Add the information
+                pomNode.appendNode('packaging', 'jar')
+                pomNode.appendNode('name', "$APP_ARTIFACT")
+                pomNode.appendNode('description', "$APP_DESCRIPTION")
+                pomNode.appendNode('url', "$APP_WEBSITE")
+                pomNode.children().last() + pomConfig
+            }
+            artifact "$pomFilePath"
+        }
+    }
+}
+
+bintray {
+    user = hasProperty('BINTRAY_USER') ? getProperty('BINTRAY_USER') : System.getenv('BINTRAY_USER')
+    key = hasProperty('BINTRAY_KEY') ? getProperty('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
+    publications = ['mavenJava']
+    pkg {
+        repo = "$APP_REPOSITORY"
+        name = "$APP_ARTIFACT"
+        desc = "$APP_DESCRIPTION"
+        websiteUrl = "$APP_WEBSITE"
+        issueTrackerUrl = "$APP_ISSUES"
+        licenses = ["$LICENSE"]
+        vcsUrl = "$APP_WEBSITE"
+        labels = ['android', 'java', 'toolbelt']
+        //noinspection GroovyAssignabilityCheck
+        version {
+            name = "$APP_VERSION"
+            desc = "$APP_DESCRIPTION"
+            released = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ", Locale.ENGLISH).format(new Date())
+            vcsTag = "$APP_WEBSITE"
+            mavenCentralSync {
+                sync = true
+                user = hasProperty('OSS_USERNAME') ? getProperty('OSS_USERNAME') : System.getenv('OSS_USERNAME')
+                password = hasProperty('OSS_KEY') ? getProperty('OSS_KEY') : System.getenv('OSS_KEY')
+                close = '1'
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier 'javadoc'
+    //noinspection GrUnresolvedAccess
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+task installToLocalRepo(dependsOn: ['publishMavenJavaPublicationToMavenLocal']) {}
+model {
+    tasks.generatePomFileForMavenJavaPublication {
+        pomDir = file("$pomFilePath")
+        destination = file("$pomFilePath")
+    }
+}
