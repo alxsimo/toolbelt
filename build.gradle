@@ -3,15 +3,14 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.novoda:bintray-release:0.3.4'
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6"
     }
 }
 
-group TOOLBELT_ORG
-version TOOLBELT_VERSION
+apply from: "publish.gradle"
 
-apply plugin: 'java'
-apply plugin: 'com.novoda.bintray-release'
+group APP_GROUP
+version APP_VERSION
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
@@ -20,66 +19,24 @@ repositories {
     mavenCentral()
 }
 
-publish {
-    userOrg = hasProperty('BINTRAY_USER') ? BINTRAY_USER : System.getenv('BINTRAY_USER')
-    groupId = TOOLBELT_ORG
-    artifactId = TOOLBELT_NAME
-    publishVersion = TOOLBELT_VERSION
-    desc = TOOLBELT_DESC
-    website = TOOLBELT_WEBSITE
-    bintrayUser = hasProperty('BINTRAY_USER') ? BINTRAY_USER : System.getenv('BINTRAY_USER')
-    bintrayKey = hasProperty('BINTRAY_KEY') ? BINTRAY_KEY : System.getenv('BINTRAY_KEY')
+task buildToolbelt(type: Exec, dependsOn: ['clean', 'generatePomFileForMavenJavaPublication']) {
+    description = 'Builds Toolbelt Library.'
+    commandLine "./gradlew", "build"
 }
+buildToolbelt.mustRunAfter('clean', 'generatePomFileForMavenJavaPublication')
 
-subprojects {
-    group = TOOLBELT_ORG
-    version = TOOLBELT_VERSION
-
-    if (IS_UPLOADING && project.name in [MODULE_NAME]) {
-        println project.name
-        apply plugin: 'maven'
-
-        gradle.taskGraph.whenReady { taskGraph ->
-            taskGraph.getAllTasks().find {
-                it.path == ":$project.name:generatePomFileForMavenPublication"
-            }.doLast {
-                file("build/publications/maven/pom-default.xml").delete()
-                println 'Overriding pom-file to make sure we can sync to maven central!'
-                pom {
-                    //noinspection GroovyAssignabilityCheck
-                    project {
-                        name "$project.name"
-                        artifactId TOOLBELT_NAME
-                        packaging project.name == 'compiler' ? 'jar' : 'aar'
-                        description DESCRIPTION
-                        url TOOLBELT_WEBSITE
-                        version TOOLBELT_VERSION
-
-                        scm {
-                            url TOOLBELT_WEBSITE
-                            connection TOOLBELT_WEBSITE
-                            developerConnection TOOLBELT_WEBSITE
-                        }
-
-                        licenses {
-                            license {
-                                name 'Apache v2'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id DEVELOPER_ID
-                                name DEVELOPER_NAME
-                                email DEVELOPER_EMAIL
-                            }
-                        }
-                    }
-                }.writeTo("build/publications/maven/pom-default.xml")
-            }
-        }
-    }
+task installToolbelt(type: Exec, dependsOn: ['buildToolbelt']) {
+    description = 'Installs Toolbelt Library to the maven local repository.'
+    commandLine "./gradlew", "installToLocalRepo"
 }
+installToolbelt.mustRunAfter('buildToolbelt')
+
+task publishToolbelt(type: Exec, dependsOn: ['buildToolbelt']) {
+    description = 'Publishes Toolbelt Library.'
+    commandLine "./gradlew", "bintrayUpload"
+}
+publishToolbelt.mustRunAfter('buildToolbelt')
+
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
