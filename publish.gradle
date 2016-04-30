@@ -21,8 +21,8 @@ if (JavaVersion.current().isJava8Compatible()) {
 def pomConfig = {
     licenses {
         license {
-            name LICENSE_NAME
-            url LICENSE_URL
+            name "$LICENSE_NAME"
+            url "$LICENSE_URL"
             distribution "repo"
         }
     }
@@ -31,7 +31,7 @@ def pomConfig = {
             name "$DEVELOPER_NAME"
             email "$DEVELOPER_EMAIL"
             organization "$APP_GROUP"
-            organizationUrl DEVELOPER_URL
+            organizationUrl "$DEVELOPER_URL"
         }
     }
     scm {

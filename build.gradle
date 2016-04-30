@@ -1,3 +1,12 @@
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
 buildscript {
     repositories {
         jcenter()
@@ -8,16 +17,6 @@ buildscript {
 }
 
 apply from: "publish.gradle"
-
-group APP_GROUP
-version APP_VERSION
-
-targetCompatibility = JavaVersion.VERSION_1_7
-sourceCompatibility = JavaVersion.VERSION_1_7
-
-repositories {
-    mavenCentral()
-}
 
 task buildToolbelt(type: Exec, dependsOn: ['clean', 'generatePomFileForMavenJavaPublication']) {
     description = 'Builds Toolbelt Library.'
