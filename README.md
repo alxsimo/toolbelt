@@ -33,4 +33,19 @@ All of 3rd party classes keep the original license header.
     - `@VisibleForTesting`
     - `@WorkInProgress`
 
+### Installing
 
+Using **maven**:
+```
+<dependency>
+  <groupId>com.alexsimo</groupId>
+  <artifactId>toolbelt</artifactId>
+  <version>1.0.0</version>
+  <type>pom</type>
+</dependency>
+```
+
+Using **gradle**:
+```
+compile 'com.alexsimo:toolbelt:1.0.0'
+```
